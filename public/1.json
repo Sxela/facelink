@@ -1,0 +1,22 @@
+{
+    "$jason": {
+      "head": {
+        "title": "{ ˃̵̑ᴥ˂̵̑}",
+        "actions": {
+          "$foreground": {
+            "type": "$reload"
+          }
+        }
+      },
+        "body": {
+          "background": {
+            "type": "html",
+            "url": "http://192.168.68.100:8080",
+            "action": {
+              "type": "$default"
+            }
+          }
+        }
+      
+    }
+  }
