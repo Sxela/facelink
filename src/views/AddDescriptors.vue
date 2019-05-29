@@ -19,7 +19,7 @@ export default {
     data(){
         return{
             testImg: require('@/img/test.jpeg'),
-            descriptors: require('../descriptors/descriptors3.json'),
+            descriptors: require('../descriptors/descriptors.json'),
             detections: [],
             drawBoxes: [],
             label: 'test'

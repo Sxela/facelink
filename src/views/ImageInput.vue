@@ -29,7 +29,7 @@ export default {
   
   methods: {
     render(){
-      const detections = JSON.parse(localStorage.getItem('detections'));
+      const detections = this.detections;
       const matches = this.matches;
       let drawBox = [];
       if (detections){
@@ -73,14 +73,14 @@ export default {
       //if (!localStorage.fullDesc || localStorage.fullDesc === null) 
       await getFullFaceDescription(image).then(fullDesc => {
 
-        localStorage.setItem('fullDesc', JSON.stringify(fullDesc));
-        localStorage.setItem('detections', JSON.stringify(fullDesc.map(fd => fd.detection)));
-        localStorage.setItem('descriptors', JSON.stringify(fullDesc.map(fd => fd.descriptor)));
+        //localStorage.setItem('fullDesc', JSON.stringify(fullDesc));
+        //localStorage.setItem('detections', JSON.stringify(fullDesc.map(fd => fd.detection)));
+        //localStorage.setItem('descriptors', JSON.stringify(fullDesc.map(fd => fd.descriptor)));
         this.detections = fullDesc.map(fd => fd.detection);
         this.descriptors = fullDesc.map(fd => fd.descriptor);
         
       });
-      if (localStorage.descriptors && localStorage.detections){
+      if (this.descriptors && this.detections){
         console.log('finding match')
         //const descriptors = JSON.parse(localStorage.getItem('descriptors'));
         //var descriptors = new Array(localStorage.getItem('descriptors'));
@@ -98,7 +98,7 @@ export default {
           return faceMatcher.findBestMatch(desc);
         }
         );
-      localStorage.setItem('match', await JSON.stringify(match));
+      //localStorage.setItem('match', await JSON.stringify(match));
       this.matches = match;
       console.log('match',match);
       }
@@ -112,7 +112,7 @@ export default {
       //const testImg = require('@/img/test.jpeg');
       //body.testImg = testImg;
       if (!this.faceMatcher) {
-        const JSON_PROFILE = require('../descriptors/bnk48.json');
+        const JSON_PROFILE = require('../descriptors/descriptors.json');
         //localStorage.setItem('faceMatcher', await createMatcher(JSON_PROFILE));
         this.faceMatcher = await createMatcher(JSON_PROFILE)
       }
