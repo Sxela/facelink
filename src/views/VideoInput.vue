@@ -94,7 +94,7 @@ export default {
           return faceMatcher.findBestMatch(desc);
         }
         );
-      localStorage.setItem('match', await JSON.stringify(match));
+      //localStorage.setItem('match', await JSON.stringify(match));
       this.matches = match;
       console.log('match',match);
       }
@@ -103,7 +103,7 @@ export default {
       setTimeout(() => this.handleVideo())
     },
 
-    async setup (){
+    async setup_video (){
       console.log('setup');
       await loadModels();
       //const testImg = require('@/img/test.jpeg');
@@ -135,7 +135,7 @@ export default {
   },
   mounted(){
     console.log('mounted');
-    this.setup(this);
+    this.setup_video(this);
   }
 }
 </script>
