@@ -109,7 +109,7 @@ export default {
       //const testImg = require('@/img/test.jpeg');
       //body.testImg = testImg;
       if (!this.faceMatcher) {
-        const JSON_PROFILE = require('../descriptors/bnk48.json');
+        const JSON_PROFILE = require('../descriptors/descriptors.json');
         //localStorage.setItem('faceMatcher', await createMatcher(JSON_PROFILE));
         this.faceMatcher = await createMatcher(JSON_PROFILE)
       }
