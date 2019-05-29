@@ -1,7 +1,7 @@
 /* eslint-disable */
 <template>
 <div>
-    <video @play="handleImage()" width="640" height="480" id="inputVideo" autoplay muted></video>
+    <video @play="handleVideo()" width="640" height="480" id="inputVideo" autoplay muted></video>
     <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style"><div :style="box.label_style">{{box.label}}</div></div>
     
 </div>   
@@ -63,10 +63,10 @@ export default {
         this.drawBoxes = drawBox;
       }
     },
-    async handleImage (){
+    async handleVideo (){
       const input = document.getElementById('inputVideo');
-      if(input.paused || input.ended) return setTimeout(() => this.handleImage (),100)
-      console.log('handleimage');
+      if(input.paused || input.ended) return setTimeout(() => this.handleVideo (),100)
+      console.log('handleVideo');
       //if (!localStorage.fullDesc || localStorage.fullDesc === null) 
       await getFullFaceVideoDescription(input).then(fullDesc => {
 
@@ -100,7 +100,7 @@ export default {
       }
 
       this.render();
-      setTimeout(() => this.handleImage())
+      setTimeout(() => this.handleVideo())
     },
 
     async setup (){
@@ -123,14 +123,14 @@ export default {
 
       
     
-      //await this.handleImage();
+      //await this.handleVideo();
 
     },
     async handleFileChange (event){
       localStorage.setItem('fullDesc', null);
       localStorage.setItem('detections', null);
       this.testImg = await URL.createObjectURL(event.target.files[0]);
-      this.handleImage();
+      this.handleVideo();
     }
   },
   mounted(){
