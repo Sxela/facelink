@@ -1,7 +1,7 @@
 /* eslint-disable */
 <template>
 <div>
-    <video @play="handleVideo()" width="640" height="480" id="inputVideo" autoplay muted></video>
+    <video class="video" @play="handleVideo()" id="inputVideo" autoplay muted></video>
     <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style"><div :style="box.label_style">{{box.label}}</div></div>
     
 </div>   
@@ -17,7 +17,8 @@ export default {
         detections: [],
         descriptions: [],
         labels: [],
-        matches: []
+        matches: [],
+        faceMatcher : null
 
     }
   },
@@ -66,35 +67,25 @@ export default {
     async handleVideo (){
       const input = document.getElementById('inputVideo');
       if(input.paused || input.ended) return setTimeout(() => this.handleVideo (),100)
-      console.log('handleVideo');
-      //if (!localStorage.fullDesc || localStorage.fullDesc === null) 
-      await getFullFaceVideoDescription(input).then(fullDesc => {
+      //console.log('handleVideo');
 
-        //localStorage.setItem('fullDesc', JSON.stringify(fullDesc));
-        //localStorage.setItem('detections', JSON.stringify(fullDesc.map(fd => fd.detection)));
-        //localStorage.setItem('descriptors', JSON.stringify(fullDesc.map(fd => fd.descriptor)));
+      await getFullFaceVideoDescription(input).then(fullDesc => {
         this.detections = fullDesc.map(fd => fd.detection);
         this.descriptors = fullDesc.map(fd => fd.descriptor);
-        
       });
-      if (this.descriptors && this.detections){
-        console.log('finding match')
-        //const descriptors = JSON.parse(localStorage.getItem('descriptors'));
-        //var descriptors = new Array(localStorage.getItem('descriptors'));
-        var descriptors = this.descriptors;
-        console.log('descriptors',descriptors)
 
-        const JSON_PROFILE = require('../descriptors/descriptors.json');
-        const faceMatcher = await createMatcher(JSON_PROFILE);
-        //localStorage.setItem('faceMatcher', JSON.stringify(faceMatcher));
+      if (this.descriptors && this.detections){
+        //console.log('finding match')
+        var descriptors = this.descriptors;
+        //console.log('descriptors',descriptors)
 
         let match = await descriptors.map(descriptor =>
         {
           let desc = new Float32Array(descriptor);
-          return faceMatcher.findBestMatch(desc);
+          return this.faceMatcher.findBestMatch(desc);
         }
         );
-      //localStorage.setItem('match', await JSON.stringify(match));
+
       this.matches = match;
       console.log('match',match);
       }
@@ -106,11 +97,9 @@ export default {
     async setup_video (){
       console.log('setup');
       await loadModels();
-      //const testImg = require('@/img/test.jpeg');
-      //body.testImg = testImg;
+
       if (!this.faceMatcher) {
         const JSON_PROFILE = require('../descriptors/descriptors.json');
-        //localStorage.setItem('faceMatcher', await createMatcher(JSON_PROFILE));
         this.faceMatcher = await createMatcher(JSON_PROFILE)
       }
 
@@ -120,10 +109,6 @@ export default {
       stream => input.srcObject = stream,
       err => alert(err)
       )
-
-      
-    
-      //await this.handleVideo();
 
     },
     async handleFileChange (event){
@@ -147,5 +132,9 @@ export default {
   width: 100%;
   margin-top: 0;
   color: '#fff';
+}
+.video{
+  max-width: 640px;
+  height: auto;
 }
 </style>

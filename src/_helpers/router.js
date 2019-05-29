@@ -12,7 +12,9 @@ export const router = new Router({
   routes: [
     { path: '/photo', component: ImageInput },
     { path: '/camera', component: VideoInput },
-    { path: '/upload', component: AddDescriptors }
+    { path: '/upload', component: AddDescriptors },
+    { path: '/', redirect: '/camera' }
     // otherwise redirect to home
-  ]
+  ],
+  linkActiveClass: "active"
 });
