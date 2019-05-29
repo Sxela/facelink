@@ -8,7 +8,7 @@
   <div style="display: flex; position: absolute;" >
     <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style"><div :style="box.label_style">{{box.label}}</div></div>
   </div>
-
+<canvas id="canvas"></canvas>
 </div>   
 </template>
 <script>
@@ -96,7 +96,7 @@ export default {
       }
 
       this.render();
-      setTimeout(() => this.handleVideo())
+      setTimeout(() => this.handleVideo(), 300)
     },
 
     async setup_video (){

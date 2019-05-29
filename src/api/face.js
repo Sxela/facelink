@@ -42,12 +42,27 @@ export async function getFullFaceVideoDescription(video, inputSize = 256) {
   });
   const useTinyModel = true;
 
+  const canvas = document.createElement('canvas');
+  canvas.height = video.videoHeight;
+  canvas.width = video.videoWidth;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  var dataURI = canvas.toDataURL('image/jpeg'); // can also use 'image/png'
+  let img = await faceapi.fetchImage(dataURI);
+  
+
   // detect all faces and generate full description from image
   // including landmark and descriptor of each face
   let fullDesc = await faceapi
-    .detectAllFaces(video, OPTION)
+    .detectAllFaces(img, OPTION)
     .withFaceLandmarks(useTinyModel)
     .withFaceDescriptors();
+
+  dataURI = null;
+  img = null;
+  ctx = null;  
+  canvas.remove();
+
   return fullDesc;
 }
 
