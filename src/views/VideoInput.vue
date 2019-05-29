@@ -1,9 +1,14 @@
 /* eslint-disable */
 <template>
-<div>
-    <video class="video" @play="handleVideo()" id="inputVideo" autoplay muted></video>
+<div style="display: flex;">
+  <div style="display: flex; justify-content:center;">
+    <video class="video" @play="handleVideo()" id="inputVideo" autoplay muted>
+    </video>
+  </div>  
+  <div style="display: flex; position: absolute;" >
     <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style"><div :style="box.label_style">{{box.label}}</div></div>
-    
+  </div>
+
 </div>   
 </template>
 <script>
