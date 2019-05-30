@@ -116,12 +116,6 @@ export default {
       )
 
     },
-    async handleFileChange (event){
-      localStorage.setItem('fullDesc', null);
-      localStorage.setItem('detections', null);
-      this.testImg = await URL.createObjectURL(event.target.files[0]);
-      this.handleVideo();
-    }
   },
   mounted(){
     console.log('mounted');

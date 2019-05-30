@@ -2,7 +2,14 @@
 <template>
 <div>
     <img :src="testImg" alt="imageURL" />
-    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style"><div :style="box.label_style">{{box.label}}</div></div>
+    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style">
+    <div class="corner top left"></div>
+    <div class="corner top right"></div>
+    <div class="corner bottom left"></div>
+    <div class="corner bottom right"></div>
+      <div :style="box.label_style">{{box.label}}</div>
+    </div>
+    
     <input
           id="myFileUpload"
           type="file"
@@ -44,9 +51,8 @@ export default {
           }
           drawBox.push({
             style: {
+
                 position: 'absolute',
-                border: 'solid',
-                borderColor: 'blue',
                 height: `${_H}px`,
                 width: `${_W}px`,
                 transform: `translate(${_X}px,${_Y}px)`,
@@ -140,5 +146,34 @@ export default {
   width: 100%;
   margin-top: 0;
   color: '#fff';
+}
+
+.corner {
+    display: block;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: white;
+    border-radius: 4px;
+}
+
+.top {
+    top: 0px;
+    border-top-style: solid;
+}
+
+.bottom {
+    bottom: 0px;
+    border-bottom-style: solid;
+}
+
+.left {
+    left: 0px;
+    border-left-style: solid;
+}
+
+.right {
+    right: 0px;
+    border-right-style: solid;
 }
 </style>
