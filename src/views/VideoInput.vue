@@ -81,7 +81,7 @@ export default {
 
       if (this.descriptors && this.detections){
         //console.log('finding match')
-        var descriptors = this.descriptors;
+        let descriptors = this.descriptors;
         //console.log('descriptors',descriptors)
 
         let match = await descriptors.map(descriptor =>
@@ -92,11 +92,11 @@ export default {
         );
 
       this.matches = match;
-      console.log('match',match);
+      //console.log('match',match);
       }
 
       this.render();
-      setTimeout(() => this.handleVideo(), 300)
+      setTimeout(() => this.handleVideo(), 10)
     },
 
     async setup_video (){
