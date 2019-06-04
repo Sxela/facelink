@@ -1,32 +1,23 @@
 /* eslint-disable */
 <template>
-<div style="display: flex; justify-content: center; min-width: 480px;">
-  <div style="max-width: 480px;">
-  <div style="display: flex; top: 0;">
+<div style="display: flex; justify-content: center; min-width: 640px;">
+  <div style="width: 640px">
+  <div style="display: flex; top: 0; ">
     <video class="video" @play="handleVideo()" id="inputVideo" autoplay muted>
     </video>
   </div>  
   <div style="display: flex; position: absolute; top: 0;">
-    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style" @click="selected=box"><div v-if="box.name!='unknown'" :style="box.label_style" class="label">{{box.name}}</div>
+    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style" @click="selected=box"><div v-if="box.label!='unknown'" :style="box.label_style" class="label">{{box.label}}</div>
       <div class="corner top left"></div>
-      <div class="corner top right"><div class="importance">{{box.rate}}°</div></div>
+      <div class="corner top right"></div>
       <div class="corner bottom left"></div>
       <div class="corner bottom right"></div>
-      
     </div>
   </div>
-  <div v-if="!this.selected.name">click on a detected face to view info</div>
-  
-  <div v-else>
-  Name: {{this.selected.name}}
-  Importance: {{this.selected.rate}}
-  Telegram:{{this.selected.telegram}}
-  </div>
-  
-
+  {{ this.msg }}
+  {{this.selected.label}}
   <button v-if="cameras.length>1" @click="switchCams()">switch</button>
   </div>
-  
 </div>   
 </template>
 <script>
@@ -45,35 +36,18 @@ export default {
         selected: {},
         cameras: [],
         selectedCamera: null,
-        getVideoSettings: {},
-        data: require("../descriptors/data")
-
-          
+        camStyle: {
+          minWidth:'640px'
         }
 
-    },
-  
-  computed:{
-    bodyStyle: function(){
-      return {
-        display: 'flex',
-        justifyContent: 'center',
-        minWidth: `${this.getVideoSettings.width}px`
-      }
-      
     }
   },
+  
   methods: {
     render(){
-      //console.log(this.matches)
       //const detections = JSON.parse(localStorage.getItem('detections'));
       const detections = this.detections;
-      //const matches = this.matches;
-      console.log(this.matches)
-      const matches = this.matches.map(
-        match =>this.data.find(element =>{ return (element.label==match.label)})
-      )
-      console.log(matches)
+      const matches = this.matches;
       let drawBox = [];
       if (detections){
         detections.forEach((detection, i) => {
@@ -81,13 +55,9 @@ export default {
           let _W = detection._box._width;
           let _X = detection._box._x;
           let _Y = detection._box._y;
-          let name = '';
-          let rate = '0';
-          let telegram = '';
+          let label = '1';
           if (matches && matches[i]) {
-            name = matches[i].name
-            rate = matches[i].rate
-            telegram = matches[i].telegram
+            label = matches[i].label
           }
           drawBox.push({
             style: {
@@ -97,15 +67,9 @@ export default {
                 height: `${_H}px`,
                 width: `${_W}px`,
                 transform: `translate(${_X}px,${_Y}px)`,
-                top:0,
-
-
-  /* Quick on the way out */
-
+                top:0
             },
-            name: name,
-            rate: rate,
-            telegram: telegram,
+            label: label,
             label_style:{
                 backgroundColor: 'white',
                 //border: 'solid',
@@ -180,17 +144,14 @@ export default {
         constraints = {
           video: { 
             deviceId: { exact: this.cameras[0].deviceId },
-            width: 640,//{ min: 480, ideal: 640 },
-            height: 480//{ min: 480, ideal: 640 }
+            width: { min: 320, ideal: window.innerWidth, max: window.innerWidth }
              }
           
         };
       } else {
         alert('no cameras found'); 
         constraints = {
-          video: { 
-            //width: { min: 320, ideal: window.innerWidth, max: window.innerWidth }, height: {ideal: window.innerHeight}
-            }
+          video: { width: { min: 320, ideal: window.innerWidth, max: window.innerWidth }}
           
         }
       }
@@ -203,27 +164,11 @@ export default {
       */
       
       navigator.mediaDevices.getUserMedia(constraints)
-      .then(stream => {
-        input.srcObject = stream 
-        this.getVideoSettings = (stream.getVideoTracks()[0].getSettings())
-        this.bodyStyle.width = this.getVideoSettings.width;
-        console.log(this.getVideoSettings)
-        this.msg = this.getVideoSettings 
-        let ratio = this.getVideoSettings.aspectRatio;
-        let constraints = {
-          video: { 
-            deviceId: { exact: this.cameras[0].deviceId },
-            width: 480,
-            height: 640 
-             }
-          
-        };
-        this.msg = stream.getVideoTracks()[0].getConstraints();
-        stream.getVideoTracks()[0].applyConstraints(constraints)
-        })
+      .then(stream => {input.srcObject = stream })
       .catch(err => alert(err))
       //this.camStyle.width = `${input.videoWidth}px`;
       
+
     },
     switchCams(){
       const input = document.getElementById('inputVideo');
@@ -259,21 +204,11 @@ export default {
   },
   mounted(){
     console.log('mounted');
-    console.log(this.data.find(element =>{ return (element.label=='spirin')}))
     this.setup_video(this);
   }
 }
 </script>
 <style>
-.importance{
-  position: relative;
-  transform: translate(30px,-30px);
-  color: white;
-
-border-radius: 4px;
-width: 100px;
-font-size: 24px;
-}
 .label{
   background-color: 'white';
   margin-top: 0;
