@@ -6,24 +6,28 @@
     </video>
   </div>  
   <div style="display: flex; position: absolute;" >
-    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style"><div :style="box.label_style">{{box.label}}</div></div>
+    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style" @click="selected=box"><div v-if="box.label!='unknown'" :style="box.label_style">{{box.label}}</div></div>
   </div>
+  {{ this.msg }}
+  {{this.selected.label}}
 <canvas id="canvas"></canvas>
 </div>   
 </template>
 <script>
 /* eslint-disable */
-import { loadModels, getFullFaceDescription, createMatcher, getFullFaceVideoDescription } from '../api/face';
+import { loadModels, createMatcher, getFullFaceVideoDescription } from '../api/face';
 export default {
   data(){
     return {
-        testImg: require('@/img/test.jpeg'),
         drawBoxes: [],
         detections: [],
         descriptions: [],
         labels: [],
         matches: [],
-        faceMatcher : null
+        faceMatcher : null,
+        msg: '',
+        selected: {},
+        cameras: []
 
     }
   },
@@ -107,13 +111,41 @@ export default {
         const JSON_PROFILE = require('../descriptors/descriptors.json');
         this.faceMatcher = await createMatcher(JSON_PROFILE)
       }
+      
 
       const input = document.getElementById('inputVideo');
+      
+      if(!navigator.mediaDevices) alert ('loaded insecurely')
+      await navigator.mediaDevices.enumerateDevices().then(devices => {
+      let  dev = devices.map(device => device.kind)
+      devices.forEach(device =>{
+        if (device.kind == 'videoinput') this.cameras.push(device);
+      })
+        this.msg = this.cameras;
+        })
+      var constraints = {};
+      if (this.cameras[0]){
+        constraints = {
+          video: { deviceId: { exact: this.cameras[0].deviceId } }
+        };
+      } else {
+        alert('no cameras found'); 
+        constraints = {
+          video: {}
+        }
+      }
+      /*
       navigator.getUserMedia(
       { video: {} },
       stream => input.srcObject = stream,
       err => alert(err)
       )
+      */
+      
+      navigator.mediaDevices.getUserMedia(constraints)
+      .then(stream => input.srcObject = stream)
+      .catch(err => alert(err))
+      
 
     },
   },
