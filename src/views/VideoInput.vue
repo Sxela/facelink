@@ -1,6 +1,6 @@
 /* eslint-disable */
 <template>
-<div style="display: flex; justify-content: center; min-width: 480px;">
+<div style="display: flex; justify-content: center; min-width: 480px; font-family: 'Montserrat', sans-serif; font-style: normal; font-weight: 500;">
   <div style="max-width: 480px;">
   <div style="display: flex; top: 0;">
     <video class="video" @play="handleVideo()" id="inputVideo" autoplay muted>
@@ -17,10 +17,18 @@
   </div>
   <div v-if="!this.selected.name">click on a detected face to view info</div>
   
-  <div v-else>
-  Name: {{this.selected.name}}
-  Importance: {{this.selected.rate}}
-  Telegram:{{this.selected.telegram}}
+  
+  <div v-else style="display: flex; justify-content: space-between; max-width: 550px;" class="card">
+    <div style="display: block;">
+    <div class="username">{{this.selected.telegram}}</div>
+    <div class="name">{{this.selected.name}}</div>
+    </div>
+    <div class="rate">
+    <div>{{this.selected.rate}}°</div>
+    </div>
+   
+  
+  
   </div>
   
 
@@ -85,7 +93,7 @@ export default {
           let rate = '0';
           let telegram = '';
           if (matches && matches[i]) {
-            name = matches[i].name
+            name = matches[i].name ? matches[i].name : matches[i].label
             rate = matches[i].rate
             telegram = matches[i].telegram
           }
@@ -265,7 +273,37 @@ export default {
 }
 </script>
 <style>
+.card{
+    padding: 50px 50px 50px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 20px rgba(184, 184, 184, 0.25);
+    word-break: break-word;
+    white-space: pre-wrap;
+    background: #fff;
+}
+.rate{
+    justify-self: flex-end;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 34px;
+    color: #585858;
+}
+.name{
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 34px;
+    color: #000;
+}
+.username{
+    font-size: 12px;
+    color: #585858;
+}
 .importance{
+  	text-shadow:
+		-1px -1px 0 #000,
+		1px -1px 0 #000,
+		-1px 1px 0 #000,
+		1px 1px 0 #000;
   position: relative;
   transform: translate(30px,-30px);
   color: white;

@@ -1,15 +1,32 @@
 /* eslint-disable */
 <template>
-<div>
+<div style="font-family: 'Montserrat', sans-serif; font-style: normal; font-weight: 500;">
     <img :src="testImg" alt="imageURL" />
-    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style">
-    <div class="corner top left"></div>
-    <div class="corner top right"></div>
-    <div class="corner bottom left"></div>
-    <div class="corner bottom right"></div>
-      <div :style="box.label_style">{{box.label}}</div>
+    <div style="display: flex; position: absolute; top: 0;">
+    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style" @click="selected=box"><div v-if="box.name!='unknown'" :style="box.label_style" class="label">{{box.name}}</div>
+      <div class="corner top left"></div>
+      <div class="corner top right"><div class="importance">{{box.rate}}°</div></div>
+      <div class="corner bottom left"></div>
+      <div class="corner bottom right"></div>
+      
     </div>
-    
+  </div>
+  <div v-if="!this.selected.name">click on a detected face to view info</div>
+  
+  <div v-else style="display: flex; justify-content: space-between; max-width: 550px;" class="card">
+    <div style="display: block;">
+    <div class="username">{{this.selected.telegram}}</div>
+    <div class="name">{{this.selected.name}}</div>
+    </div>
+    <div class="rate">
+    <div>{{this.selected.rate}}°</div>
+    </div>
+   
+  
+  
+  </div>
+  
+
     <input
           id="myFileUpload"
           type="file"
@@ -29,15 +46,29 @@ export default {
         detections: [],
         descriptions: [],
         labels: [],
-        matches: []
+        matches: [],
+        faceMatcher : null,
+        msg: '',
+        selected: {},
+        cameras: [],
+        selectedCamera: null,
+        getVideoSettings: {},
+        data: require("../descriptors/data")
 
     }
   },
   
   methods: {
     render(){
+      //console.log(this.matches)
+      //const detections = JSON.parse(localStorage.getItem('detections'));
       const detections = this.detections;
-      const matches = this.matches;
+      //const matches = this.matches;
+      console.log(this.matches)
+      const matches = this.matches.map(
+        match =>this.data.find(element =>{ return (element.label==match.label)})
+      )
+      console.log(matches)
       let drawBox = [];
       if (detections){
         detections.forEach((detection, i) => {
@@ -45,28 +76,42 @@ export default {
           let _W = detection._box._width;
           let _X = detection._box._x;
           let _Y = detection._box._y;
-          let label = '1';
+          let name = '';
+          let rate = '0';
+          let telegram = '';
           if (matches && matches[i]) {
-            label = matches[i].label
+            name = matches[i].name ? matches[i].name : matches[i].label
+            rate = matches[i].rate
+            telegram = matches[i].telegram
           }
           drawBox.push({
             style: {
-
                 position: 'absolute',
+                //border: 'solid',
+                //borderColor: 'blue',
                 height: `${_H}px`,
                 width: `${_W}px`,
                 transform: `translate(${_X}px,${_Y}px)`,
-                top:0
+                top:0,
+
+
+  /* Quick on the way out */
+
             },
-            label: label,
+            name: name,
+            rate: rate,
+            telegram: telegram,
             label_style:{
-                backgroundColor: 'blue',
-                border: 'solid',
-                borderColor: 'blue',
+                backgroundColor: 'white',
+                //border: 'solid',
+                //borderColor: 'blue',
                 width: _W,
+                textAlign: 'center',
                 marginTop: 0,
-                color: '#fff',
-                transform: `translate(-3px,${_H}px)`
+                color: '#000',
+                fontSize: '24px',
+                transform: `translate(-3px,${_H}px)`,
+                textTransform: 'capitalize'
             }
           })
         })
@@ -139,6 +184,31 @@ export default {
 }
 </script>
 <style>
+.card{
+    padding: 50px 50px 50px;
+    border-radius: 12px;
+    box-shadow: 0px 0px 20px rgba(184, 184, 184, 0.25);
+    word-break: break-word;
+    white-space: pre-wrap;
+    background: #fff;
+}
+.rate{
+    justify-self: flex-end;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 34px;
+    color: #585858;
+}
+.name{
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 34px;
+    color: #000;
+}
+.username{
+    font-size: 12px;
+    color: #585858;
+}
 .label{
   background-color: 'blue';
   border: '1px solid';
