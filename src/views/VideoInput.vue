@@ -3,7 +3,7 @@
 <div style="display: flex; justify-content: center; min-width: 480px; font-family: 'Montserrat', sans-serif; font-style: normal; font-weight: 500;">
   <div style="max-width: 480px;">
   <div style="display: flex; top: 0;">
-    <video class="video" @play="handleVideo()" id="inputVideo" autoplay muted>
+    <video class="video" @play="handleVideo()" id="inputVideo" autoplay muted playsinline>
     </video>
   </div>  
   <div style="display: flex; position: absolute; top: 0;">
@@ -32,7 +32,7 @@
   </div>
   
 
-  <button v-if="cameras.length>1" @click="switchCams()">switch</button>
+  <button v-if="cameras.length>100" @click="switchCams()">switch</button>
   </div>
   
 </div>   
@@ -187,9 +187,12 @@ export default {
         this.selectedCamera = this.cameras[0];
         constraints = {
           video: { 
-            deviceId: { exact: this.cameras[0].deviceId },
-            width: 640,//{ min: 480, ideal: 640 },
-            height: 480//{ min: 480, ideal: 640 }
+            facingMode: "environment",
+            //deviceId: { exact: this.cameras[0].deviceId },
+            //width: 640,//{ min: 480, ideal: 640 },
+            //height: 480//{ min: 480, ideal: 640 }
+            width: window.innerHeight - 150,
+            height: (window.innerWidth)
              }
           
         };
@@ -220,9 +223,12 @@ export default {
         let ratio = this.getVideoSettings.aspectRatio;
         let constraints = {
           video: { 
-            deviceId: { exact: this.cameras[0].deviceId },
-            width: 480,
-            height: 640 
+            //facingMode: "environment",
+            //deviceId: { exact: this.cameras[0].deviceId },
+            //width: 480,
+            //height: 640 
+            //width: window.innerWidth/10,
+            //height: window.innerHeight
              }
           
         };

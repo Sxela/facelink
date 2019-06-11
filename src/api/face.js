@@ -54,7 +54,8 @@ export async function getFullFaceVideoDescription(video, inputSize = 256) {
   // detect all faces and generate full description from image
   // including landmark and descriptor of each face
   let fullDesc = await faceapi
-    .detectAllFaces(img, OPTION)
+    //.detectAllFaces(img, OPTION)
+    .detectAllFaces(video, OPTION)
     .withFaceLandmarks(useTinyModel)
     .withFaceDescriptors();
 
