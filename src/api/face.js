@@ -63,7 +63,7 @@ export async function getFullFaceVideoDescription(video, inputSize = 256) {
     //.detectAllFaces(img, OPTION)
     .detectAllFaces(video, OPTION)
     .withFaceLandmarks(useTinyModel)
-    // .withAgeAndGender()
+    .withAgeAndGender()
     .withFaceDescriptors();
 
   dataURI = null;
