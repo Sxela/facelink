@@ -29,7 +29,7 @@ export default {
         async setup (){
             console.log('setup');
             await loadModels();
-            await this.handleImage();
+            await this.handleImage1();
 
         },
 
@@ -46,10 +46,10 @@ export default {
             a.dispatchEvent(e);
         },
 
-        async handleImage (){
+        async handleImage1 (){
             const image = this.testImg;
             const label = this.label;
-            console.log('handleimage');
+            console.log('handleImage1');
             await getFullFaceDescription(image).then(fullDesc => {
                 this.detections = fullDesc.map(fd => fd.detection);
                 fullDesc.forEach(item=>{
@@ -73,7 +73,7 @@ export default {
 
         async handleFileChange (event){
             this.testImg = await URL.createObjectURL(event.target.files[0]);
-            this.handleImage();
+            this.handleImage1();
         },
 
         render(){
