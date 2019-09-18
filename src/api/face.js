@@ -10,6 +10,7 @@ export async function loadModels() {
   await faceapi.loadTinyFaceDetectorModel(MODEL_URL);
   await faceapi.loadFaceLandmarkTinyModel(MODEL_URL);
   await faceapi.loadFaceRecognitionModel(MODEL_URL);
+  await faceapi.loadAgeGenderModel(MODEL_URL)
 }
 
 export async function getFullFaceDescription(blob, inputSize = 512) {
@@ -23,13 +24,17 @@ export async function getFullFaceDescription(blob, inputSize = 512) {
 
   // fetch image to api
   let img = await faceapi.fetchImage(blob);
-
+  console.log(img.width, img.height)
   // detect all faces and generate full description from image
   // including landmark and descriptor of each face
   let fullDesc = await faceapi
     .detectAllFaces(img, OPTION)
     .withFaceLandmarks(useTinyModel)
+    .withAgeAndGender()
     .withFaceDescriptors();
+
+
+  // console.log(fullDesc)
   return fullDesc;
 }
 
@@ -53,10 +58,12 @@ export async function getFullFaceVideoDescription(video, inputSize = 256) {
 
   // detect all faces and generate full description from image
   // including landmark and descriptor of each face
-  let fullDesc = await faceapi
+  console.log('got to fulldesc detectallfaces')
+  let fullDesc1 = await faceapi
     //.detectAllFaces(img, OPTION)
     .detectAllFaces(video, OPTION)
     .withFaceLandmarks(useTinyModel)
+    // .withAgeAndGender()
     .withFaceDescriptors();
 
   dataURI = null;
@@ -64,7 +71,7 @@ export async function getFullFaceVideoDescription(video, inputSize = 256) {
   ctx = null;  
   //canvas.remove();
 
-  return fullDesc;
+  return fullDesc1;
 }
 
 

@@ -7,9 +7,9 @@
     </video>
   </div>  
   <div style="display: flex; position: absolute; top: 0;">
-    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style" @click="selected=box"><div v-if="box.name!='unknown'" :style="box.label_style" class="label">{{box.name}}</div>
+    <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style" @click="selected=box"><div :style="box.label_style" class="label">{{box.name}}, visits: {{box.count}}</div>
       <div class="corner top left"></div>
-      <div class="corner top right"><div class="importance">{{box.rate}}°</div></div>
+      <div class="corner top right"><div class="importance">{{box.rate}}°</div> <div class="importance" >{{box.gender}}, {{Math.floor(box.age)}}y.o.</div></div>
       <div class="corner bottom left"></div>
       <div class="corner bottom right"></div>
       
@@ -43,9 +43,12 @@ import { loadModels, createMatcher, getFullFaceVideoDescription } from '../api/f
 export default {
   data(){
     return {
+
         drawBoxes: [],
         detections: [],
         descriptions: [],
+        ages: [],
+        genders: [],
         labels: [],
         matches: [],
         faceMatcher : null,
@@ -54,9 +57,9 @@ export default {
         cameras: [],
         selectedCamera: null,
         getVideoSettings: {},
-        data: require("../descriptors/data")
-
-          
+        counts: [],
+        data: require("../descriptors/data"),
+        descs: require('../descriptors/descriptors.json') 
         }
 
     },
@@ -77,11 +80,11 @@ export default {
       //const detections = JSON.parse(localStorage.getItem('detections'));
       const detections = this.detections;
       //const matches = this.matches;
-      console.log(this.matches)
+      // console.log(this.matches)
       const matches = this.matches.map(
         match =>this.data.find(element =>{ return (element.label==match.label)})
       )
-      console.log(matches)
+      // console.log(matches)
       let drawBox = [];
       if (detections){
         detections.forEach((detection, i) => {
@@ -92,11 +95,17 @@ export default {
           let name = '';
           let rate = '0';
           let telegram = '';
+          let count = '';
+          let age = this.ages[i];
+          let gender = this.genders[i];
           if (matches && matches[i]) {
             name = matches[i].name ? matches[i].name : matches[i].label
             rate = matches[i].rate
             telegram = matches[i].telegram
+            count = matches[i].count
           }
+          if (name == 'unknown' || !name) name = 'new';
+          gender = (gender=='female') ? '♀' : '♂'  ;
           drawBox.push({
             style: {
                 position: 'absolute',
@@ -114,6 +123,9 @@ export default {
             name: name,
             rate: rate,
             telegram: telegram,
+            age: age,
+            gender: gender,
+            count: count,
             label_style:{
                 backgroundColor: 'white',
                 //border: 'solid',
@@ -140,26 +152,87 @@ export default {
       await getFullFaceVideoDescription(input).then(fullDesc => {
         this.detections = fullDesc.map(fd => fd.detection);
         this.descriptors = fullDesc.map(fd => fd.descriptor);
+        this.ages = fullDesc.map(fd => fd.age);
+        this.genders = fullDesc.map(fd => fd.gender);
       });
 
       if (this.descriptors && this.detections){
-        //console.log('finding match')
-        let descriptors = this.descriptors;
-        //console.log('descriptors',descriptors)
+        console.log('finding match')
+        //const descriptors = JSON.parse(localStorage.getItem('descriptors'));
+        //var descriptors = new Array(localStorage.getItem('descriptors'));
+        var descriptors = this.descriptors;
+        // console.log('descriptors',descriptors)
+
+        //const JSON_PROFILE = require('../descriptors/bnk48.json');
+        // const JSON_PROFILE = require('../descriptors/descriptors.json');
+        let JSON_PROFILE = this.descs;
+        const faceMatcher = await createMatcher(JSON_PROFILE);
+        //localStorage.setItem('faceMatcher', JSON.stringify(faceMatcher));
 
         let match = await descriptors.map(descriptor =>
         {
           let desc = new Float32Array(descriptor);
-          return this.faceMatcher.findBestMatch(desc);
+          return faceMatcher.findBestMatch(desc);
         }
         );
-
+      //localStorage.setItem('match', await JSON.stringify(match));
       this.matches = match;
-      //console.log('match',match);
+      // console.log('match',match);
       }
 
+      String.prototype.hashCode = function() {
+        var hash = 0, i, chr;
+        if (this.length === 0) return hash;
+        for (i = 0; i < this.length; i++) {
+          chr   = this.charCodeAt(i);
+          hash  = ((hash << 5) - hash) + chr;
+          hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+      };
+
+      await this.matches.forEach((m,i) =>{
+        let date = new Date()
+        let match = this.data.find(element =>{ return (element.label==m.label)})
+        // console.log('math id', match)
+        if (match && !match.date) {
+          match.date = date
+          match.count = 1
+        }
+        if (m.label == 'unknown') {
+          console.log('got unknown'); 
+          let newlabel = date.toString()
+          newlabel = newlabel.hashCode().toString()
+          this.descs[newlabel] = {}
+          this.descs[newlabel].name = newlabel
+          this.descs[newlabel].descriptors = []
+          this.descs[newlabel].descriptors.push(this.descriptors[i])
+
+          
+          let desc = {}
+          desc.date = date
+          desc.name = 'new'
+          desc.count = 1
+          desc.label = newlabel
+          this.data.push(desc)
+          console.log('label', newlabel)
+          }
+          else {
+            // if dates are more different than thresh set count up
+            let datediff = date.getTime()-match.date.getTime(); 
+            datediff = datediff/ (1000*60) //diff in minutes 
+            console.log('datediff',datediff)
+            if (datediff>1){
+              match.date = date;
+              match.count ++}
+          }
+          
+        // console.log(this.data);
+        // console.log(this.descs)
+      })
+
       this.render();
-      setTimeout(() => this.handleVideo(), 10)
+      setTimeout(() => this.handleVideo(), 100)
     },
 
     async setup_video (){
@@ -325,6 +398,8 @@ font-size: 24px;
 }
 .video{
   max-width: 640px;
+  min-width: 256px;
+  min-height: 256px;
   height: auto;
 }
 .top {
