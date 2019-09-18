@@ -1,6 +1,6 @@
 /* eslint-disable */
 import * as faceapi from 'face-api.js';
-
+// import * as faceapi from '../faceapi'
 // Load models and weights
 export async function loadModels() {
   //const MODEL_URL = process.env.PUBLIC_URL + '/models';

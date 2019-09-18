@@ -1,7 +1,7 @@
 /* eslint-disable */
 <template>
 <div style="font-family: 'Montserrat', sans-serif; font-style: normal; font-weight: 500;">
-    <img :src="testImg" alt="imageURL" style="min-width: 256px; min-height: 256px;"/>
+    <img :src="testImg" alt="imageURL" style="min-width: 256px; min-height: 256px;">
     <div style="display: flex; position: absolute; top: 0;">
     <div v-for="box in drawBoxes" :key="box.style.transform" :style="box.style" @click="selected=box"><div :style="box.label_style" class="label">{{box.name}}, visits: {{box.count}}</div>
       <div class="corner top left"></div>
